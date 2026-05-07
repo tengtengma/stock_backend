@@ -43,12 +43,36 @@ class FeatureBuilder:
         out["chan_segment_count"] = float(len(segments))
         return out
 
+    @staticmethod
+    def _future_extreme_return(
+        close: pd.Series, prices: pd.Series, horizon: int, use_max: bool
+    ) -> pd.Series:
+        values = prices.to_list()
+        close_values = close.to_list()
+        output: list[float] = []
+
+        for idx, close_now in enumerate(close_values):
+            future_window = values[idx + 1 : idx + 1 + horizon]
+            if len(future_window) < horizon or close_now == 0:
+                output.append(np.nan)
+                continue
+            target_price = max(future_window) if use_max else min(future_window)
+            output.append(target_price / close_now - 1)
+        return pd.Series(output, index=close.index)
+
     def build_dataset(self, df: pd.DataFrame) -> pd.DataFrame:
         out = self._add_return_features(df)
         out = self._add_volume_price_features(out)
         out = self._chan_stat_features(out)
         out["next_1d_return"] = out["close"].shift(-1) / out["close"] - 1
         out["label"] = (out["next_1d_return"] > 0).astype(int)
+        for horizon in (3, 5, 10):
+            out[f"upside_{horizon}d"] = self._future_extreme_return(
+                out["close"], out["high"], horizon, use_max=True
+            )
+            out[f"downside_{horizon}d"] = self._future_extreme_return(
+                out["close"], out["low"], horizon, use_max=False
+            )
         out = out.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
         return out
 

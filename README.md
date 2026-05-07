@@ -34,8 +34,13 @@ FastAPI backend for A-share daily analysis that combines:
 
 ## Notes
 
-- Default data source is AkShare (`stock_zh_a_hist`).
+- Default data source is Tushare (`pro.daily`), configurable via `STOCK_AI_DATA_PROVIDER`.
 - Cached market data and model files are stored under `backend/storage/`.
 - This implementation is an MVP and focuses on reliable engineering structure first.
+
+## Data source config
+
+- `STOCK_AI_DATA_PROVIDER=auto` (default), `tushare` or `akshare`
+- `STOCK_AI_TUSHARE_TOKEN=your_token` when using tushare
 # stock_backend
 # stock_backend

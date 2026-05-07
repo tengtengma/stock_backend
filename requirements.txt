@@ -6,5 +6,6 @@ numpy
 scikit-learn
 joblib
 akshare
+tushare
 pytest
 httpx

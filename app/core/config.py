@@ -12,6 +12,12 @@ class Settings(BaseSettings):
     model_dir_name: str = "models"
     default_start_date: str = "20180101"
     default_end_date: str = "20261231"
+    # 数据源：
+    # - "auto": 优先 tushare（需已安装且配置 token），否则回退 akshare
+    # - "tushare": 强制使用 tushare（token 缺失或未安装将直接报错）
+    # - "akshare": 强制使用 akshare
+    data_provider: str = "auto"
+    tushare_token: str = ""
     model_config = SettingsConfigDict(env_prefix="STOCK_AI_", env_file=".env", extra="ignore")
 
     @property
